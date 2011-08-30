@@ -1,3 +1,9 @@
+mintupdate-debian (1.0.3) debian; urgency=low
+
+  * Added compatibility for "kept back" updates (solves cases where user sees a "fix broken packages" message). 
+
+ -- Clement Lefebvre <root@linuxmint.com>  Tue,  30 Aug 2011 11:18:00 +0000
+
 mintupdate-debian (1.0.2) debian; urgency=low
 
   * Improved restart mechanism
