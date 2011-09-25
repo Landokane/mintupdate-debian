@@ -709,13 +709,10 @@ def install(widget, treeView, statusIcon, wTree):
         lm_debian_repo_url = None 
         for item in acquire.items:
             repo = item.desc_uri
-            if "Packages.bz2" in repo:            
-                if "debian.linuxmint.com/latest/dists" in repo:
-                    lm_debian_repo_url = "http://debian.linuxmint.com/latest"
-                    break
-                if "debian.linuxmint.com/incoming/dists" in repo:
-                    lm_debian_repo_url = "http://debian.linuxmint.com/incoming"
-                    break                            
+            if repo.endswith('Packages.bz2') and ('/latest/dists/testing/' in repo or
+               '/incoming/dists/testing/' in repo):
+                lm_debian_repo_url = repo.partition('/dists/')[0]
+                break
         if lm_debian_repo_url is not None:
             url = "%s/update-pack-info.txt" % lm_debian_repo_url
             import urllib2
@@ -1142,18 +1139,18 @@ def open_pack_info(widget):
         points_to_lm = False
         for item in acquire.items:
             repo = item.desc_uri
-            if "Packages.bz2" in repo:
-                if ("packages.linuxmint.com/dists/debian" in repo) or ("dists/debian/upstream" in repo):
+            if repo.endswith('Packages.bz2'):
+                if '/dists/debian/upstream/' in repo:
                     points_to_lm = True
-                if "debian.linuxmint.com/latest/dists" in repo:
+                elif '/latest/dists/testing/' in repo:
                     points_to_lm_debian_latest = True
                     points_to_lm_debian = True
-                    lm_debian_repo_url = "http://debian.linuxmint.com/latest"
-                if "debian.linuxmint.com/incoming/dists" in repo:
+                    lm_debian_repo_url = repo.partition('/dists/')[0]
+                elif '/incoming/dists/testing/' in repo:
                     points_to_lm_debian_incoming = True
                     points_to_lm_debian = True
-                    lm_debian_repo_url = "http://debian.linuxmint.com/incoming"
-                if "debian.org/debian/dists" in repo and "//ftp." in repo:
+                    lm_debian_repo_url = repo.partition('/dists/')[0]
+                elif 'debian.org/debian/dists' in repo and '//ftp.' in repo:
                     points_to_debian = True
         if points_to_debian and points_to_lm_debian:
             #Conflict between DEBIAN and LM_DEBIAN
