@@ -1145,11 +1145,11 @@ def open_pack_info(widget):
                 elif '/latest/dists/testing/' in repo:
                     points_to_lm_debian_latest = True
                     points_to_lm_debian = True
-                    lm_debian_repo_url = repo.partition('/dists/')[0]
+                    lm_debian_repo_url = "http://debian.linuxmint.com/latest"
                 elif '/incoming/dists/testing/' in repo:
                     points_to_lm_debian_incoming = True
                     points_to_lm_debian = True
-                    lm_debian_repo_url = repo.partition('/dists/')[0]
+                    lm_debian_repo_url = "http://debian.linuxmint.com/incoming"
                 elif 'debian.org/debian/dists' in repo and '//ftp.' in repo:
                     points_to_debian = True
         if points_to_debian and points_to_lm_debian:
