@@ -1131,53 +1131,110 @@ def open_pack_info(widget):
         acquire = apt_pkg.Acquire()
         slist = apt_pkg.SourceList()    
         slist.read_main_list()    
-        slist.get_indexes(acquire, True)    
-        points_to_debian = False
-        points_to_lm_debian_latest = False
-        points_to_lm_debian_incoming = False
-        points_to_lm_debian = False
-        points_to_lm = False
+        slist.get_indexes(acquire, True)          
+        
+        # There's 3 valid configurations (for main repo, multimedia and security):
+        #     
+        #      1. Not recommended, fully rolling: Debian Testing, multimedia, security
+        #      2. Recommended, Latest update packs: LM_Latest, LM_Latest_Multimedia, LM_Latest_Security
+        #      3. For testers, Incoming update packs: LM_Incoming, LM_Incoming_Multimedia, LM_Incoming_Security
+        
+        # Which repo do the sources use for the main archive?
+        main_points_to_debian = False
+        main_points_to_latest = False
+        main_points_to_incoming = False
+        main_points_to_lm = False 
+        
+        # Which repo do the sources use for multimedia?
+        multimedia_points_to_debian = False
+        multimedia_points_to_latest = False
+        multimedia_points_to_incoming = False
+        
+        # Which repo do the sources use for security?
+        security_points_to_debian = False
+        security_points_to_latest = False
+        security_points_to_incoming = False
+                   
+        lm_is_here = False # Is the Linux Mint repo itself present?
+        
         for item in acquire.items:
             repo = item.desc_uri
             if repo.endswith('Packages.bz2'):
+                #Check LM
                 if '/dists/debian/upstream/' in repo:
-                    points_to_lm = True
+                    lm_is_here = True
+                #Check main archive
                 elif '/latest/dists/testing/' in repo:
-                    points_to_lm_debian_latest = True
-                    points_to_lm_debian = True
+                    main_points_to_latest = True
+                    main_points_to_lm = True
                     lm_debian_repo_url = "http://debian.linuxmint.com/latest"
                 elif '/incoming/dists/testing/' in repo:
-                    points_to_lm_debian_incoming = True
-                    points_to_lm_debian = True
+                    main_points_to_incoming = True
+                    main_points_to_lm = True
                     lm_debian_repo_url = "http://debian.linuxmint.com/incoming"
                 elif 'debian.org/debian/dists' in repo and '//ftp.' in repo:
-                    points_to_debian = True
-        if points_to_debian and points_to_lm_debian:
+                    main_points_to_debian = True
+                #Check multimedia
+                elif '/latest/multimedia/dists/testing/' in repo:
+                    multimedia_points_to_latest = True
+                elif '/incoming/multimedia/dists/testing/' in repo:
+                    multimedia_points_to_incoming = True
+                elif 'debian-multimedia.org' in repo:
+                    multimedia_points_to_debian = True
+                #Check security
+                elif '/latest/security/dists/testing/' in repo:
+                    security_points_to_latest = True
+                elif '/incoming/security/dists/testing/' in repo:
+                    security_points_to_incoming = True
+                elif 'security.debian.org' in repo:
+                    security_points_to_debian = True
+                                                        
+        if main_points_to_debian and main_points_to_lm:
             #Conflict between DEBIAN and LM_DEBIAN
             config_str = _("Your system is pointing to ftp.debian.org and debian.linuxmint.com") + "\n" + _("These repositories conflict with each others")
             wTree.get_widget("image_system_config").set_from_stock(gtk.STOCK_DIALOG_ERROR, gtk.ICON_SIZE_SMALL_TOOLBAR)
-        elif points_to_lm_debian_incoming and points_to_lm_debian_latest:
+        elif main_points_to_incoming and main_points_to_latest:
             #Conflict between LM_DEBIAN_INCOMING and LM_DEBIAN_LATEST
             config_str = _("Your system is pointing to debian.linuxmint.com/latest and debian.linuxmint.com/incoming") + "\n" + _("These repositories conflict with each others")
             wTree.get_widget("image_system_config").set_from_stock(gtk.STOCK_DIALOG_ERROR, gtk.ICON_SIZE_SMALL_TOOLBAR)
-        elif not points_to_lm:
+        elif not lm_is_here:
             #Missing LM
             config_str = _("Your system is not pointing to the Linux Mint repositories") + "\n" + _("Add 'deb http://packages.linuxmint.com/ debian main upstream import' to your APT sources")
             wTree.get_widget("image_system_config").set_from_stock(gtk.STOCK_DIALOG_ERROR, gtk.ICON_SIZE_SMALL_TOOLBAR)
-        elif not (points_to_lm_debian or points_to_debian):
+        elif not (main_points_to_lm or main_points_to_debian):
             #Missing DEBIAN or LM_DEBIAN
             config_str = _("Your system is not pointing to any Debian repository") + "\n" + _("Add 'deb http://debian.linuxmint.com/latest testing main contrib non-free' to your APT sources")
             wTree.get_widget("image_system_config").set_from_stock(gtk.STOCK_DIALOG_ERROR, gtk.ICON_SIZE_SMALL_TOOLBAR)
         else:
-            if points_to_debian:
+            if main_points_to_debian:
                 config_str = _("Your system is pointing directly to Debian") + "\n" + _("This is only recommended for experienced users")
                 wTree.get_widget("image_system_config").set_from_stock(gtk.STOCK_DIALOG_WARNING, gtk.ICON_SIZE_SMALL_TOOLBAR)
-            elif points_to_lm_debian_incoming:
-                config_str = _("Your system is pointing to the 'Linux Mint Debian Incoming' repository") + "\n" + _("This is only recommend for experienced users")
-                wTree.get_widget("image_system_config").set_from_stock(gtk.STOCK_DIALOG_WARNING, gtk.ICON_SIZE_SMALL_TOOLBAR)                
-            elif points_to_lm_debian_latest:
-                config_str = _("Your system is pointing to the 'Linux Mint Debian Latest' repository")
-                wTree.get_widget("image_system_config").set_from_stock(gtk.STOCK_DIALOG_INFO, gtk.ICON_SIZE_SMALL_TOOLBAR)
+            elif main_points_to_incoming: 
+                if multimedia_points_to_debian:
+                    config_str = _("Your system is pointing directly at debian-multimedia.org") + "\n" + _("Replace 'deb http://debian-multimedia.org testing main non-free' with 'deb http://debian.linuxmint.com/incoming/multimedia testing main non-free' in your APT sources")
+                    wTree.get_widget("image_system_config").set_from_stock(gtk.STOCK_DIALOG_ERROR, gtk.ICON_SIZE_SMALL_TOOLBAR)
+                elif security_points_to_debian:
+                    config_str = _("Your system is pointing directly at security.debian.org") + "\n" + _("Replace 'deb http://security.debian.org testing/updates main contrib non-free' with 'deb http://debian.linuxmint.com/incoming/security testing/updates main contrib non-free' in your APT sources")
+                    wTree.get_widget("image_system_config").set_from_stock(gtk.STOCK_DIALOG_ERROR, gtk.ICON_SIZE_SMALL_TOOLBAR)
+                elif (multimedia_points_to_latest or security_points_to_latest):
+                    config_str = _("Some of your repositories point to Latest, others point to Incoming") + "\n" + _("Please check your APT sources.")
+                    wTree.get_widget("image_system_config").set_from_stock(gtk.STOCK_DIALOG_ERROR, gtk.ICON_SIZE_SMALL_TOOLBAR)
+                else: 
+                    config_str = _("Your system is pointing to the 'Linux Mint Debian Incoming' repository") + "\n" + _("This is only recommend for experienced users")
+                    wTree.get_widget("image_system_config").set_from_stock(gtk.STOCK_DIALOG_WARNING, gtk.ICON_SIZE_SMALL_TOOLBAR)                
+            elif main_points_to_latest:
+                if multimedia_points_to_debian:
+                    config_str = _("Your system is pointing directly at debian-multimedia.org") + "\n" + _("Replace 'deb http://debian-multimedia.org testing main non-free' with 'deb http://debian.linuxmint.com/latest/multimedia testing main non-free' in your APT sources")
+                    wTree.get_widget("image_system_config").set_from_stock(gtk.STOCK_DIALOG_ERROR, gtk.ICON_SIZE_SMALL_TOOLBAR)
+                elif security_points_to_debian:
+                    config_str = _("Your system is pointing directly at security.debian.org") + "\n" + _("Replace 'deb http://security.debian.org testing/updates main contrib non-free' with 'deb http://debian.linuxmint.com/latest/security testing/updates main contrib non-free' in your APT sources")
+                    wTree.get_widget("image_system_config").set_from_stock(gtk.STOCK_DIALOG_ERROR, gtk.ICON_SIZE_SMALL_TOOLBAR)
+                elif (multimedia_points_to_incoming or security_points_to_incoming):
+                    config_str = _("Some of your repositories point to Latest, others point to Incoming") + "\n" + _("Please check your APT sources.")
+                    wTree.get_widget("image_system_config").set_from_stock(gtk.STOCK_DIALOG_ERROR, gtk.ICON_SIZE_SMALL_TOOLBAR)
+                else:                    
+                    config_str = _("Your system is pointing to the 'Linux Mint Debian Latest' repository")
+                    wTree.get_widget("image_system_config").set_from_stock(gtk.STOCK_DIALOG_INFO, gtk.ICON_SIZE_SMALL_TOOLBAR)
     except Exception, detail:
         print detail
     

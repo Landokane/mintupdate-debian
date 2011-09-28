@@ -1,3 +1,10 @@
+mintupdate-debian (1.0.4) debian; urgency=low
+
+  * Better detection of Update Packs mirrors
+  * Added detection for security and multimedia repositories
+
+ -- Clement Lefebvre <root@linuxmint.com>  Wed,  28 Sep 2011 11:31:00 +0000
+
 mintupdate-debian (1.0.3) debian; urgency=low
 
   * Added compatibility for "kept back" updates (solves cases where user sees a "fix broken packages" message). 
