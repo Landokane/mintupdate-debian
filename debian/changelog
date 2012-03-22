@@ -1,3 +1,9 @@
+mintupdate-debian (1.0.5) debian; urgency=low
+
+  * removed onlyShowIn clause in xdg autostart file
+
+ -- Clement Lefebvre <root@linuxmint.com>  Thu, 22 Mar 2012 14:11:03 +0000
+
 mintupdate-debian (1.0.4) debian; urgency=low
 
   * Better detection of Update Packs mirrors
