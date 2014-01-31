@@ -1,3 +1,9 @@
+mintupdate-debian (1.0.7) debian; urgency=low
+
+  * Caught up with changes from mintupdate
+
+ -- Clement Lefebvre <root@linuxmint.com>  Fri, 31 Jan 2014 15:43:00 +0000
+
 mintupdate-debian (1.0.6) debian; urgency=low
 
   * Added dependency on mint-debian-mirrors
