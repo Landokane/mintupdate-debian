@@ -1,3 +1,9 @@
+mintupdate-debian (1.0.6) debian; urgency=low
+
+  * Added dependency on mint-debian-mirrors
+
+ -- Clement Lefebvre <root@linuxmint.com>  Thu, 13 Sep 2012 09:51:25 +0100
+
 mintupdate-debian (1.0.5) debian; urgency=low
 
   * removed onlyShowIn clause in xdg autostart file

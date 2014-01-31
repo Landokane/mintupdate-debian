@@ -7,7 +7,7 @@ Standards-Version: 3.7.2
 
 Package: mintupdate-debian
 Architecture: all
-Depends: python (>= 2.4), python (<< 3), python-gtk2, python-glade2, synaptic, mint-common
+Depends: python (>= 2.4), python (<< 3), python-gtk2, python-glade2, synaptic, mint-common, mint-debian-mirrors
 Conflicts: mintupdate-gnome, mintupdate-kde, mintupdate-xfce, mintupdate
 Replaces: mintupdate-gnome, mintupdate-kde, mintupdate-xfce, mintupdate
 Description: Update Manager
