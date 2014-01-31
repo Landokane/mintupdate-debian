@@ -918,7 +918,9 @@ def read_configuration():
     return prefs
 
 def open_repositories(widget):
-    if os.path.exists("/usr/bin/software-properties-gtk"):
+    if os.path.exists("/usr/bin/software-sources"):
+    	os.system("/usr/bin/software-sources &")
+    elif os.path.exists("/usr/bin/software-properties-gtk"):
         os.system("/usr/bin/software-properties-gtk &")
     elif os.path.exists("/usr/bin/software-properties-kde"):
         os.system("/usr/bin/software-properties-kde &")
@@ -1671,7 +1673,7 @@ try:
     prefsMenuItem.get_child().set_text(_("Preferences"))
     prefsMenuItem.connect("activate", open_preferences, treeview_update, statusIcon, wTree)
     editSubmenu.append(prefsMenuItem)
-    if os.path.exists("/usr/bin/software-properties-gtk") or os.path.exists("/usr/bin/software-properties-kde"):
+    if os.path.exists("/usr/bin/software-sources") or os.path.exists("/usr/bin/software-properties-gtk") or os.path.exists("/usr/bin/software-properties-kde"):
         sourcesMenuItem = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES)
         sourcesMenuItem.set_image(gtk.image_new_from_file("/usr/lib/linuxmint/mintUpdate/icons/software-properties.png"))
         sourcesMenuItem.get_child().set_text(_("Software sources"))
