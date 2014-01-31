@@ -1,3 +1,9 @@
+mintupdate-debian (1.0.8) debian; urgency=low
+
+  * Switch to mintsources
+
+ -- Clement Lefebvre <root@linuxmint.com>  Fri, 31 Jan 2014 17:17:27 +0000
+
 mintupdate-debian (1.0.7) debian; urgency=low
 
   * Caught up with changes from mintupdate
